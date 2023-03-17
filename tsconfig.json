@@ -1,5 +1,4 @@
 {
-  "include": ["./src/**/*"],
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",

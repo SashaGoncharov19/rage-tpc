@@ -1,0 +1,10 @@
+{
+  "name": "rage-tpc",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "scripts": {},
+  "license": "ISC",
+  "devDependencies": {
+    "@rtpc/tsconfig": "workspace:*"
+  }
+}

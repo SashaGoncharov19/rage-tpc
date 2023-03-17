@@ -1,0 +1,14 @@
+{
+  "name": "@rtpc/client",
+  "types": "./src/index.ts",
+  "scripts": {},
+  "license": "ISC",
+  "devDependencies": {
+    "@rtpc/server": "workspace:*",
+    "@rtpc/tsconfig": "workspace:*",
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0"
+  },
+  "dependencies": {
+    "rage-tpc": "workspace:*"
+  }
+}

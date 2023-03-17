@@ -1,14 +1,47 @@
 lockfileVersion: 5.4
 
-specifiers:
-  '@types/ragemp-c': https://github.com/CocaColaBear/types-ragemp-c/tarball/v2.0
-  '@types/ragemp-s': https://github.com/CocaColaBear/types-ragemp-s/tarball/master
-  typescript: ^5.0.2
+importers:
 
-devDependencies:
-  '@types/ragemp-c': '@github.com/CocaColaBear/types-ragemp-c/tarball/v2.0'
-  '@types/ragemp-s': '@github.com/CocaColaBear/types-ragemp-s/tarball/master'
-  typescript: 5.0.2
+  .:
+    specifiers:
+      typescript: ^5.0.2
+    devDependencies:
+      typescript: 5.0.2
+
+  apps/client:
+    specifiers:
+      '@rtpc/server': workspace:*
+      '@rtpc/tsconfig': workspace:*
+      '@types/ragemp-c': github:CocaColaBear/types-ragemp-c#v2.0
+      rage-tpc: workspace:*
+    dependencies:
+      rage-tpc: link:../../packages/rage-tpc
+    devDependencies:
+      '@rtpc/server': link:../server
+      '@rtpc/tsconfig': link:../../packages/tsconfig
+      '@types/ragemp-c': github.com/CocaColaBear/types-ragemp-c/a3c05445adf9d9303ccd695d6a192b36573e6ce8
+
+  apps/server:
+    specifiers:
+      '@rtpc/client': workspace:*
+      '@rtpc/tsconfig': workspace:*
+      '@types/ragemp-s': github:CocaColaBear/types-ragemp-s#v1.0
+      rage-tpc: workspace:*
+    dependencies:
+      rage-tpc: link:../../packages/rage-tpc
+    devDependencies:
+      '@rtpc/client': link:../client
+      '@rtpc/tsconfig': link:../../packages/tsconfig
+      '@types/ragemp-s': github.com/CocaColaBear/types-ragemp-s/e694d5b12b29b8b3600fc8e0b0c3a8886fcc838c
+
+  packages/rage-tpc:
+    specifiers:
+      '@rtpc/tsconfig': workspace:*
+    devDependencies:
+      '@rtpc/tsconfig': link:../tsconfig
+
+  packages/tsconfig:
+    specifiers: {}
 
 packages:
 
@@ -18,14 +51,14 @@ packages:
     hasBin: true
     dev: true
 
-  '@github.com/CocaColaBear/types-ragemp-c/tarball/v2.0':
-    resolution: {tarball: https://github.com/CocaColaBear/types-ragemp-c/tarball/v2.0}
+  github.com/CocaColaBear/types-ragemp-c/a3c05445adf9d9303ccd695d6a192b36573e6ce8:
+    resolution: {tarball: https://codeload.github.com/CocaColaBear/types-ragemp-c/tar.gz/a3c05445adf9d9303ccd695d6a192b36573e6ce8}
     name: '@types/ragemp-c'
     version: 2.1.1
     dev: true
 
-  '@github.com/CocaColaBear/types-ragemp-s/tarball/master':
-    resolution: {tarball: https://github.com/CocaColaBear/types-ragemp-s/tarball/master}
+  github.com/CocaColaBear/types-ragemp-s/e694d5b12b29b8b3600fc8e0b0c3a8886fcc838c:
+    resolution: {tarball: https://codeload.github.com/CocaColaBear/types-ragemp-s/tar.gz/e694d5b12b29b8b3600fc8e0b0c3a8886fcc838c}
     name: '@types/ragemp-s'
-    version: 0.2.25
+    version: 1.1.1
     dev: true
