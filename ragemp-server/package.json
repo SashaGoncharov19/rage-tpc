@@ -1,0 +1,8 @@
+{
+  "name": "ragemp-server",
+  "main": "index.js",
+  "license": "ISC",
+  "dependencies": {
+    "@rtpc/server": "workspace:*"
+  }
+}

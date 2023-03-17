@@ -1,12 +1,20 @@
 {
   "name": "@rtpc/client",
   "types": "./src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "webpack"
+  },
   "license": "ISC",
   "devDependencies": {
     "@rtpc/server": "workspace:*",
     "@rtpc/tsconfig": "workspace:*",
-    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0"
+    "@types/node": "^18.15.3",
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0",
+    "@types/webpack": "^5.28.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2",
+    "webpack": "^5.76.2",
+    "webpack-cli": "^5.0.1"
   },
   "dependencies": {
     "rage-tpc": "workspace:*"

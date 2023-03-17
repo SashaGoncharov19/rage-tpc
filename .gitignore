@@ -1,7 +1,12 @@
 .vscode
 .idea
 node_modules
+dist
 
-server/**
-!server/conf.json
-
+ragemp-server/client_packages/**
+ragemp-server/bin/**
+ragemp-server/dotnet/**
+ragemp-server/maps/**
+ragemp-server/plugins/**
+ragemp-server/BugTrap-x64.dll
+ragemp-server/ragemp-server.exe

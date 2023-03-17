@@ -1,12 +1,16 @@
 {
   "name": "@rtpc/server",
+  "main": "./src/index.js",
   "types": "./src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "tsup"
+  },
   "license": "ISC",
   "devDependencies": {
     "@rtpc/client": "workspace:*",
     "@rtpc/tsconfig": "workspace:*",
-    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#v1.0"
+    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#v1.0",
+    "tsup": "^6.6.3"
   },
   "dependencies": {
     "rage-tpc": "workspace:*"

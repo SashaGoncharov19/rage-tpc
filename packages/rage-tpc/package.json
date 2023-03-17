@@ -2,9 +2,12 @@
   "name": "rage-tpc",
   "main": "./dist/index.js",
   "types": "./src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "tsup"
+  },
   "license": "ISC",
   "devDependencies": {
-    "@rtpc/tsconfig": "workspace:*"
+    "@rtpc/tsconfig": "workspace:*",
+    "tsup": "^6.6.3"
   }
 }
