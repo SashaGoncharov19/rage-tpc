@@ -1,9 +1,13 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/ragemp-c': https://github.com/CocaColaBear/types-ragemp-c/tarball/v2.0
+  '@types/ragemp-s': https://github.com/CocaColaBear/types-ragemp-s/tarball/master
   typescript: ^5.0.2
 
 devDependencies:
+  '@types/ragemp-c': '@github.com/CocaColaBear/types-ragemp-c/tarball/v2.0'
+  '@types/ragemp-s': '@github.com/CocaColaBear/types-ragemp-s/tarball/master'
   typescript: 5.0.2
 
 packages:
@@ -12,4 +16,16 @@ packages:
     resolution: {integrity: sha512-wVORMBGO/FAs/++blGNeAVdbNKtIh1rbBL2EyQ1+J9lClJ93KiiKe8PmFIVdXhHcyv44SL9oglmfeSsndo0jRw==}
     engines: {node: '>=12.20'}
     hasBin: true
+    dev: true
+
+  '@github.com/CocaColaBear/types-ragemp-c/tarball/v2.0':
+    resolution: {tarball: https://github.com/CocaColaBear/types-ragemp-c/tarball/v2.0}
+    name: '@types/ragemp-c'
+    version: 2.1.1
+    dev: true
+
+  '@github.com/CocaColaBear/types-ragemp-s/tarball/master':
+    resolution: {tarball: https://github.com/CocaColaBear/types-ragemp-s/tarball/master}
+    name: '@types/ragemp-s'
+    version: 0.2.25
     dev: true
