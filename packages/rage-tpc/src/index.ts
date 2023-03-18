@@ -11,16 +11,24 @@
 // server (player.call) -> client (browser.call) -> cef
 declare const Metadata: unique symbol;
 
-type GetMetadata<T> = T extends { [Metadata]: infer K } ? K : never;
+type WithMetadata<T> = { [Metadata]?: T };
 
 type EventsRoute<
   TEvents extends Record<
     string,
     ServerProcedure<any[]> | ClientProcedure<any[]> | EventsRoute
-  > = Record<string, any>
+  > = Record<string, ServerProcedure<any[]> | ClientProcedure<any[]> | EventsRoute<any>>
 > = {
   build(keyPrefix?: string): void;
   events: TEvents;
+};
+
+type EventsRouteCaller<TEvents extends EventsRoute> = {
+  [K in keyof TEvents['events']]: TEvents['events'][K] extends WithMetadata<{ publicType: infer K }>
+    ? K
+    : TEvents['events'][K] extends EventsRoute<any>
+    ? EventsRouteCaller<TEvents['events'][K]>
+    : never;
 };
 
 type ServerProcedure<TArgs extends any[]> = {
@@ -46,9 +54,8 @@ type ServerRTPC = {
     cb: (player: PlayerMp, ...args: TArgs) => void
   ): ServerProcedure<TArgs>;
 
-  createClientCaller<TClient>(): {
-    broadcast: TClient;
-    to(player: PlayerMp): TClient;
+  createClientCaller<TClient extends EventsRoute>(): {
+    to(player: PlayerMp): EventsRouteCaller<TClient>;
   };
   // createCEFCaller<TClient>(): TClient;
 };
@@ -60,7 +67,7 @@ type ClientRTPC = {
 
   procedure<TArgs extends any[]>(cb: (...args: TArgs) => void): ClientProcedure<TArgs>;
 
-  createServerCaller<TClient>(): TClient;
+  createServerCaller<TClient extends EventsRoute>(): EventsRouteCaller<TClient>;
   // createCEFCaller<TClient>(): TClient;
 };
 
@@ -82,7 +89,14 @@ export function createServerRTPC(): ServerRTPC {
       };
     },
     procedure: cb => cb,
-    createClientCaller: (() => {}) as any,
+    createClientCaller: () => ({
+      to: player =>
+        createRecursiveFnProxy((keys, args) => {
+          if (keys.length === 0) return;
+          const eventName = keys.join(':');
+          player.call(eventName, args);
+        }) as any,
+    }),
   };
 }
 
@@ -104,8 +118,25 @@ export function createClientRTPC(): ClientRTPC {
       };
     },
     procedure: cb => cb,
-    createServerCaller: (() => {}) as any,
+    createServerCaller: () =>
+      createRecursiveFnProxy((keys, args) => {
+        if (keys.length === 0) return;
+        const eventName = keys.join(':');
+        mp.events.callRemote(eventName, ...args);
+      }) as any,
   };
+}
+
+function createRecursiveFnProxy(
+  fn: (keys: string[], args: any[]) => any,
+  keys: string[] = []
+): (keys: string[], args: any[]) => any {
+  return new Proxy(((...args: any[]) => fn(keys, args)) as any, {
+    get(_, key) {
+      const typedKey = key as string;
+      return createRecursiveFnProxy(fn, [...keys, typedKey]);
+    },
+  });
 }
 
 // createLocalClient - why tho?

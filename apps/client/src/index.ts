@@ -14,7 +14,7 @@ const appRoutes = rtpc.events({
 });
 
 mp.keys.bind(0x36, true, () => {
-  mp.events.callRemote('login', 'hi', 'from client');
+  server.login('hi', 'from client');
 });
 
 appRoutes.build();

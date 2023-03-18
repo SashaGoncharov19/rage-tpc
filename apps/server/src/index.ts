@@ -9,7 +9,7 @@ const client = rtpc.createClientCaller<ClientRoutes>();
 const appRoutes = rtpc.events({
   login: rtpc.procedure(async (player, login: string, password: string) => {
     console.log(`${login} ${password} ${player.socialClub}`);
-    player.call('showHud', [false]);
+    client.to(player).showHud(false);
   }),
 });
 
