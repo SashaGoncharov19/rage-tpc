@@ -9,5 +9,9 @@
   "devDependencies": {
     "@rtpc/tsconfig": "workspace:*",
     "tsup": "^6.6.3"
+  },
+  "optionalDependencies": {
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0",
+    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#v1.0"
   }
 }

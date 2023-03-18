@@ -6,12 +6,14 @@ import type { ClientRoutes } from '@rtpc/client';
 const rtpc = createServerRTPC();
 const client = rtpc.createClientCaller<ClientRoutes>();
 
-const appRoutes = rtpc.route({
+const appRoutes = rtpc.events({
   login: rtpc.procedure(async (player, login: string, password: string) => {
-    if (login === password) {
-      await client.to(player).showHud(false);
-    }
+    // if (login === password) {
+    //   await client.to(player).showHud(false);
+    // }
   }),
 });
+
+appRoutes.build();
 
 export type ServerRoutes = typeof appRoutes;

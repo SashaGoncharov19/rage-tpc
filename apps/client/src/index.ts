@@ -5,12 +5,13 @@ import type { ServerRoutes } from '@rtpc/server';
 
 const rtpc = createClientRTPC();
 const server = rtpc.createServerCaller<ServerRoutes>();
-server.login('as', 'as');
 
-const appRoutes = rtpc.route({
+const appRoutes = rtpc.events({
   showHud: rtpc.procedure((shown: boolean) => {
     mp.gui.chat.show(shown);
   }),
 });
+
+appRoutes.build();
 
 export type ClientRoutes = typeof appRoutes;
