@@ -1,3 +1,6 @@
+/// <reference types="ragemp-s" />
+/// <reference types="ragemp-c" />
+
 // server (player.call) -> client
 // client (mp.events.callRemote) -> server
 

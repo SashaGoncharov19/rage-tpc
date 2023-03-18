@@ -1,5 +1,6 @@
 /// <reference types="@types/node"/>
 const path = require('path');
+const loader = require("ts-loader");
 
 /** @type {import('webpack').Configuration} */
 module.exports = {
@@ -10,8 +11,14 @@ module.exports = {
     rules: [
       {
         test: /\.ts?$/,
-        use: 'ts-loader',
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true
+          }
+        }],
         exclude: /node_modules/,
+
       },
     ],
   },

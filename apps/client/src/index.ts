@@ -9,7 +9,12 @@ const server = rtpc.createServerCaller<ServerRoutes>();
 const appRoutes = rtpc.events({
   showHud: rtpc.procedure((shown: boolean) => {
     mp.gui.chat.show(shown);
+    mp.console.logInfo(`${shown}`, true, true);
   }),
+});
+
+mp.keys.bind(0x36, true, () => {
+  mp.events.callRemote('login', 'hi', 'from client');
 });
 
 appRoutes.build();
