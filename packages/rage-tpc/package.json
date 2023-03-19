@@ -9,10 +9,15 @@
   "license": "ISC",
   "devDependencies": {
     "@rtpc/tsconfig": "workspace:*",
+    "@types/uuid": "^9.0.1",
     "tsup": "^6.6.3"
   },
   "optionalDependencies": {
     "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0",
     "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#v1.0"
+  },
+  "dependencies": {
+    "superjson": "^1.12.2",
+    "uuid": "^9.0.0"
   }
 }

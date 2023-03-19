@@ -13,8 +13,9 @@ const appRoutes = rtpc.events({
   }),
 });
 
-mp.keys.bind(0x36, true, () => {
-  server.login('hi', 'from client');
+mp.keys.bind(0x36, true, async () => {
+  const data = await server.login('hi', 'from client');
+  mp.console.logInfo(data, true, true);
 });
 
 appRoutes.build();
