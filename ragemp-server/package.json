@@ -2,6 +2,9 @@
   "name": "ragemp-server",
   "main": "index.js",
   "license": "ISC",
+  "scripts": {
+    "clean": "rimraf node_modules && rimraf client_packages"
+  },
   "dependencies": {
     "@rtpc/server": "workspace:*"
   }

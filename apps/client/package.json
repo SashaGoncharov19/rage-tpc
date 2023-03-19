@@ -2,7 +2,8 @@
   "name": "@rtpc/client",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "clean": "rimraf node_modules"
   },
   "license": "ISC",
   "devDependencies": {

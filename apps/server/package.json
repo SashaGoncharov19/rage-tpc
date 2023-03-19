@@ -3,7 +3,8 @@
   "main": "./src/index.js",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "clean": "rimraf node_modules && rimraf dist"
   },
   "license": "ISC",
   "devDependencies": {
