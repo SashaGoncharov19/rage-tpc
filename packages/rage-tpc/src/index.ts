@@ -1,8 +1,22 @@
 /// <reference types="ragemp-s" />
 /// <reference types="ragemp-c" />
 
-import SuperJSON from 'superjson';
-import { v4 as uuid } from 'uuid';
+function uuid() {
+  let uuid = '', random;
+
+  for (let i = 0; i < 32; i++) {
+    random = Math.random() * 16 | 0;
+
+    if (i === 8 || i === 12 || i === 16 || i === 20) {
+      uuid += '-';
+    }
+
+    uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random))
+        .toString(16);
+  }
+
+  return uuid;
+}
 
 // server (player.call) -> client
 // client (mp.events.callRemote) -> server
@@ -121,7 +135,7 @@ export function createServerRTPC(): ServerRTPC {
     },
     procedure: cb => ({
       async fn(player, requestString) {
-        const request = SuperJSON.parse<RTPCRequest<any>>(requestString);
+        const request = JSON.parse(requestString) as RTPCRequest<any>;
 
         try {
           const result = await cb(player, ...request.data);
@@ -133,7 +147,7 @@ export function createServerRTPC(): ServerRTPC {
           };
 
           player.call(`${RTPCEvents.Response}:${request.clientId}`, [
-            SuperJSON.stringify(response),
+            JSON.stringify(response),
           ]);
         } catch (error) {
           const response: RTPCResponse = {
@@ -144,7 +158,7 @@ export function createServerRTPC(): ServerRTPC {
           };
 
           player.call(`${RTPCEvents.Response}:${request.clientId}`, [
-            SuperJSON.stringify(response),
+            JSON.stringify(response),
           ]);
         }
       },
@@ -153,8 +167,8 @@ export function createServerRTPC(): ServerRTPC {
       const clientId = uuid();
       const responseCallbackMap = new Map<string, Defer>();
 
-      mp.events.add(`${RTPCEvents.Response}:${clientId}`, (responseString: string) => {
-        const response = SuperJSON.parse<RTPCResponse>(responseString);
+      mp.events.add(`${RTPCEvents.Response}:${clientId}`, (player: PlayerMp, responseString: string) => {
+        const response = JSON.parse(responseString) as RTPCResponse;
         const responseCallback = responseCallbackMap.get(response.id);
 
         if (!responseCallback) return;
@@ -179,9 +193,9 @@ export function createServerRTPC(): ServerRTPC {
             };
 
             responseCallbackMap.set(requestId, deferred);
-            player.call(eventName, [SuperJSON.stringify(request)]);
+            player.call(eventName, [JSON.stringify(request)]);
 
-            return timeout(deferred.promise, 100_000);
+            return deferred.promise;
           }) as any,
       };
     },
@@ -207,7 +221,7 @@ export function createClientRTPC(): ClientRTPC {
     },
     procedure: cb => ({
       async fn(requestString) {
-        const request = SuperJSON.parse<RTPCRequest<any>>(requestString);
+        const request = JSON.parse(requestString) as RTPCRequest<any>;
 
         try {
           const result = await cb(...request.data);
@@ -220,7 +234,7 @@ export function createClientRTPC(): ClientRTPC {
 
           mp.events.callRemote(
             `${RTPCEvents.Response}:${request.clientId}`,
-            SuperJSON.stringify(response)
+            JSON.stringify(response)
           );
         } catch (error) {
           const response: RTPCResponse = {
@@ -232,7 +246,7 @@ export function createClientRTPC(): ClientRTPC {
 
           mp.events.callRemote(
             `${RTPCEvents.Response}:${request.clientId}`,
-            SuperJSON.stringify(response)
+            JSON.stringify(response)
           );
         }
       },
@@ -242,7 +256,7 @@ export function createClientRTPC(): ClientRTPC {
       const responseCallbackMap = new Map<string, Defer>();
 
       mp.events.add(`${RTPCEvents.Response}:${clientId}`, (responseString: string) => {
-        const response = SuperJSON.parse<RTPCResponse>(responseString);
+        const response = JSON.parse(responseString) as RTPCResponse;
         const responseCallback = responseCallbackMap.get(response.id);
 
         if (!responseCallback) return;
@@ -265,9 +279,10 @@ export function createClientRTPC(): ClientRTPC {
         };
 
         responseCallbackMap.set(requestId, deferred);
-        mp.events.callRemote(eventName, SuperJSON.stringify(request));
+        mp.events.callRemote(eventName, JSON.stringify(request));
 
-        return timeout(deferred.promise, 100_000);
+        // return timeout(deferred.promise, 100_000); // TODO
+        return deferred.promise;
       }) as any;
     },
   };
