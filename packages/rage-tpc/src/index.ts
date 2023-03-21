@@ -2,17 +2,17 @@
 /// <reference types="ragemp-c" />
 
 function uuid() {
-  let uuid = '', random;
+  let uuid = '',
+    random;
 
   for (let i = 0; i < 32; i++) {
-    random = Math.random() * 16 | 0;
+    random = (Math.random() * 16) | 0;
 
     if (i === 8 || i === 12 || i === 16 || i === 20) {
       uuid += '-';
     }
 
-    uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random))
-        .toString(16);
+    uuid += (i === 12 ? 4 : i === 16 ? (random & 3) | 8 : random).toString(16);
   }
 
   return uuid;
@@ -36,10 +36,10 @@ enum RTPCEvents {
 type WithMetadata<T> = { [Metadata]?: T };
 
 type EventsRoute<
-  TEvents extends Record<string, ServerProcedure | ClientProcedure | EventsRoute> = Record<
+  TEvents extends Record<
     string,
-    ServerProcedure | ClientProcedure | EventsRoute<any>
-  >
+    ServerProcedure | ClientProcedure | BrowserProcedure | EventsRoute
+  > = Record<string, ServerProcedure | ClientProcedure | BrowserProcedure | EventsRoute<any>>
 > = {
   build(keyPrefix?: string): void;
   events: TEvents;
@@ -83,10 +83,6 @@ type ServerProcedure<TArgs extends any[] = any[], TReturn = any> = BaseProcedure
   fn(player: PlayerMp, request: string): Promise<void>;
 };
 
-type ClientProcedure<TArgs extends any[] = any[], TReturn = any> = BaseProcedure<TArgs, TReturn> & {
-  fn(request: string): Promise<void>;
-};
-
 type ServerRTPC = {
   events<TEvents extends Record<string, ServerProcedure | EventsRoute>>(
     events: TEvents
@@ -99,20 +95,7 @@ type ServerRTPC = {
   createClientCaller<TClient extends EventsRoute>(): {
     to(player: PlayerMp): EventsRouteCaller<TClient>;
   };
-  // createCEFCaller<TClient>(): TClient;
-};
-
-type ClientRTPC = {
-  events<TEvents extends Record<string, ClientProcedure | EventsRoute>>(
-    events: TEvents
-  ): EventsRoute<TEvents>;
-
-  procedure<TArgs extends any[], TReturn>(
-    cb: (...args: TArgs) => TReturn
-  ): ClientProcedure<TArgs, TReturn>;
-
-  createServerCaller<TClient extends EventsRoute>(): EventsRouteCaller<TClient>;
-  // createCEFCaller<TClient>(): TClient;
+  // createBrowserCaller<TClient>(): TClient;
 };
 
 // TODO: Remove code duplication
@@ -146,9 +129,7 @@ export function createServerRTPC(): ServerRTPC {
             data: result,
           };
 
-          player.call(`${RTPCEvents.Response}:${request.clientId}`, [
-            JSON.stringify(response),
-          ]);
+          player.call(`${RTPCEvents.Response}:${request.clientId}`, [JSON.stringify(response)]);
         } catch (error) {
           const response: RTPCResponse = {
             status: 'error',
@@ -157,9 +138,7 @@ export function createServerRTPC(): ServerRTPC {
             error,
           };
 
-          player.call(`${RTPCEvents.Response}:${request.clientId}`, [
-            JSON.stringify(response),
-          ]);
+          player.call(`${RTPCEvents.Response}:${request.clientId}`, [JSON.stringify(response)]);
         }
       },
     }),
@@ -167,17 +146,20 @@ export function createServerRTPC(): ServerRTPC {
       const clientId = uuid();
       const responseCallbackMap = new Map<string, Defer>();
 
-      mp.events.add(`${RTPCEvents.Response}:${clientId}`, (player: PlayerMp, responseString: string) => {
-        const response = JSON.parse(responseString) as RTPCResponse;
-        const responseCallback = responseCallbackMap.get(response.id);
+      mp.events.add(
+        `${RTPCEvents.Response}:${clientId}`,
+        (player: PlayerMp, responseString: string) => {
+          const response = JSON.parse(responseString) as RTPCResponse;
+          const responseCallback = responseCallbackMap.get(response.id);
 
-        if (!responseCallback) return;
-        if (response.status === 'ok') responseCallback.resolve(response.data);
-        else
-          responseCallback.reject(
-            new RTPCError('Client returned error', { cause: response.error })
-          );
-      });
+          if (!responseCallback) return;
+          if (response.status === 'ok') responseCallback.resolve(response.data);
+          else
+            responseCallback.reject(
+              new RTPCError('Client returned error', { cause: response.error })
+            );
+        }
+      );
 
       return {
         to: player =>
@@ -201,6 +183,25 @@ export function createServerRTPC(): ServerRTPC {
     },
   };
 }
+
+type ClientProcedure<TArgs extends any[] = any[], TReturn = any> = BaseProcedure<TArgs, TReturn> & {
+  fn(request: string): Promise<void>;
+};
+
+type ClientRTPC = {
+  events<TEvents extends Record<string, ClientProcedure | EventsRoute>>(
+    events: TEvents
+  ): EventsRoute<TEvents>;
+
+  procedure<TArgs extends any[], TReturn>(
+    cb: (...args: TArgs) => TReturn
+  ): ClientProcedure<TArgs, TReturn>;
+
+  createServerCaller<TClient extends EventsRoute>(): EventsRouteCaller<TClient>;
+  createBrowserCaller<TClient extends EventsRoute>(): {
+    to(browser: BrowserMp): EventsRouteCaller<TClient>;
+  };
+};
 
 export function createClientRTPC(): ClientRTPC {
   return {
@@ -280,6 +281,142 @@ export function createClientRTPC(): ClientRTPC {
 
         responseCallbackMap.set(requestId, deferred);
         mp.events.callRemote(eventName, JSON.stringify(request));
+
+        // return timeout(deferred.promise, 100_000); // TODO
+        return deferred.promise;
+      }) as any;
+    },
+    createBrowserCaller: () => {
+      const clientId = uuid();
+      const responseCallbackMap = new Map<string, Defer>();
+
+      mp.events.add(`${RTPCEvents.Response}:${clientId}`, (responseString: string) => {
+        const response = JSON.parse(responseString) as RTPCResponse;
+        const responseCallback = responseCallbackMap.get(response.id);
+
+        if (!responseCallback) return;
+        if (response.status === 'ok') responseCallback.resolve(response.data);
+        else
+          responseCallback.reject(
+            new RTPCError('Browser returned error', { cause: response.error })
+          );
+      });
+
+      return {
+        to: browser =>
+          createRecursiveFnProxy((keys, args) => {
+            if (keys.length === 0) return;
+            const requestId = uuid();
+            const eventName = keys.join(':');
+            const deferred = defer();
+            const request: RTPCRequest = {
+              clientId,
+              id: requestId,
+              data: args,
+            };
+
+            responseCallbackMap.set(requestId, deferred);
+            browser.call(eventName, JSON.stringify(request));
+
+            // return timeout(deferred.promise, 100_000); // TODO
+            return deferred.promise;
+          }) as any,
+      };
+    },
+  };
+}
+
+type BrowserProcedure<TArgs extends any[] = any[], TReturn = any> = BaseProcedure<
+  TArgs,
+  TReturn
+> & {
+  fn(request: string): Promise<void>;
+};
+
+type BrowserRTPC = {
+  events<TEvents extends Record<string, BrowserProcedure | EventsRoute>>(
+    events: TEvents
+  ): EventsRoute<TEvents>;
+
+  procedure<TArgs extends any[], TReturn>(
+    cb: (...args: TArgs) => TReturn
+  ): BrowserProcedure<TArgs, TReturn>;
+
+  createClientCaller<TClient extends EventsRoute>(): EventsRouteCaller<TClient>;
+};
+
+export function createBrowserRTPC(): BrowserRTPC {
+  return {
+    events: eventMap => {
+      return {
+        events: eventMap,
+        build: keyPrefix => {
+          for (const [key, handlerOrEventMap] of Object.entries(eventMap)) {
+            const eventName = keyPrefix ? `${keyPrefix}:${key}` : key;
+            if ('build' in handlerOrEventMap) {
+              handlerOrEventMap.build(eventName);
+            } else {
+              mp.events.add(eventName, handlerOrEventMap.fn);
+            }
+          }
+        },
+      };
+    },
+    procedure: cb => ({
+      async fn(requestString) {
+        const request = JSON.parse(requestString) as RTPCRequest<any>;
+
+        try {
+          const result = await cb(...request.data);
+          const response: RTPCResponse = {
+            status: 'ok',
+            id: request.id,
+            clientId: request.clientId,
+            data: result,
+          };
+
+          mp.events.call(`${RTPCEvents.Response}:${request.clientId}`, JSON.stringify(response));
+        } catch (error) {
+          const response: RTPCResponse = {
+            status: 'error',
+            id: request.id,
+            clientId: request.clientId,
+            error,
+          };
+
+          mp.events.call(`${RTPCEvents.Response}:${request.clientId}`, JSON.stringify(response));
+        }
+      },
+    }),
+    createClientCaller: () => {
+      const clientId = uuid();
+      const responseCallbackMap = new Map<string, Defer>();
+
+      mp.events.add(`${RTPCEvents.Response}:${clientId}`, (responseString: string) => {
+        const response = JSON.parse(responseString) as RTPCResponse;
+        const responseCallback = responseCallbackMap.get(response.id);
+
+        if (!responseCallback) return;
+        if (response.status === 'ok') responseCallback.resolve(response.data);
+        else
+          responseCallback.reject(
+            new RTPCError('Client returned error', { cause: response.error })
+          );
+      });
+
+      return createRecursiveFnProxy((keys, args) => {
+        if (keys.length === 0) return;
+        const requestId = uuid();
+        const eventName = keys.join(':');
+        const deferred = defer();
+        const request: RTPCRequest = {
+          clientId,
+          id: requestId,
+          data: args,
+        };
+
+        responseCallbackMap.set(requestId, deferred);
+        mp.events.call(eventName, JSON.stringify(request));
 
         // return timeout(deferred.promise, 100_000); // TODO
         return deferred.promise;
