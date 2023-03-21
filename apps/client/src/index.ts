@@ -1,29 +1,16 @@
 /// <reference types="@types/ragemp-c"/>
 
-import { createBrowserRTPC, createClientRTPC } from 'rage-tpc';
+import { createClientRTPC } from 'rage-tpc';
 import type { ServerRoutes } from '@rtpc/server';
-
-// TODO: Move to `ui` package
-{
-  const rtpc = createBrowserRTPC();
-  const clientRTPC = rtpc.createClientCaller<ClientRoutes>();
-
-  const appRoutes = rtpc.events({
-    hello: rtpc.procedure(async () => {
-      console.log('Hello');
-      await clientRTPC.world();
-    }),
-  });
-
-  export type BrowserRoutes = typeof appRoutes;
-}
+import type { BrowserRoutes } from '@rtpc/browser';
 
 const rtpc = createClientRTPC();
 const serverRTPC = rtpc.createServerCaller<ServerRoutes>();
 const browserRTPC = rtpc.createBrowserCaller<BrowserRoutes>();
 
-const browser = mp.browsers.new('');
-browserRTPC.to(browser).hello();
+const browser = mp.browsers.new('package://browser/index.html');
+
+browserRTPC.to(browser);
 
 const appRoutes = rtpc.events({
   showHud: rtpc.procedure((shown: boolean) => {
