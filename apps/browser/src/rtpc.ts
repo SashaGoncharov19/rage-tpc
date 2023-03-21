@@ -1,5 +1,3 @@
-/// <reference types="@types/ragemp-c"/>
-
 import { createBrowserRTPC } from 'rage-tpc';
 import { ClientRoutes } from '@rtpc/client';
 
