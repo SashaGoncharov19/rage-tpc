@@ -1,1 +1,1 @@
-export type { BrowserRoutes } from './src';
+export type { BrowserRoutes } from './src/rtpc';

@@ -10,7 +10,7 @@ const browserRTPC = rtpc.createBrowserCaller<BrowserRoutes>();
 
 const browser = mp.browsers.new('package://browser/index.html');
 
-browserRTPC.to(browser);
+browserRTPC.to(browser).hello();
 
 const appRoutes = rtpc.events({
   showHud: rtpc.procedure((shown: boolean) => {

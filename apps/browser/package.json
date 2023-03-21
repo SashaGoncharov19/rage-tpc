@@ -38,6 +38,7 @@
     ]
   },
   "devDependencies": {
-    "@rtpc/client": "workspace:*"
+    "@rtpc/client": "workspace:*",
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0"
   }
 }
