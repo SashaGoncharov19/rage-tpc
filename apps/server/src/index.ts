@@ -1,4 +1,4 @@
-/// <reference types="@types/ragemp-s" />
+/// <reference types="@ragempcommunity/types-server" />
 
 import { createServerRTPC } from 'rage-tpc';
 import type { ClientRoutes } from '@rtpc/client';

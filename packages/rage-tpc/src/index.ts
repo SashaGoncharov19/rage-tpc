@@ -1,5 +1,5 @@
-/// <reference types="ragemp-s" />
-/// <reference types="ragemp-c" />
+/// <reference types="@ragempcommunity/types-server" />
+/// <reference types="@ragempcommunity/types-client" />
 
 function uuid() {
   let uuid = '',

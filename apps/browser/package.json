@@ -39,6 +39,6 @@
   },
   "devDependencies": {
     "@rtpc/client": "workspace:*",
-    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0"
+    "@ragempcommunity/types-cef": "^2.1.6"
   }
 }

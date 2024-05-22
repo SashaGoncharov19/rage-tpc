@@ -11,7 +11,7 @@
     "@rtpc/server": "workspace:*",
     "@rtpc/tsconfig": "workspace:*",
     "@types/node": "^18.15.3",
-    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v2.0",
+    "@ragempcommunity/types-client": "^2.1.6",
     "@types/webpack": "^5.28.0",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.2",
