@@ -1,5 +1,8 @@
 /// <reference types="@ragempcommunity/types-server" />
 
+import './events'
+import './commands'
+
 import { createServerRTPC } from 'rage-tpc';
 import type { ClientRoutes } from '@rtpc/client';
 
@@ -12,15 +15,6 @@ const appRoutes = rtpc.events({
     await clientRTPC.to(player).showHud(false);
     return 'successfully logged in';
   }),
-});
-
-mp.events.addCommand('veh', (player, fullText, name, plate) => {
-  const { position, dimension } = player;
-  const vehicle = mp.vehicles.new(mp.joaat(name ?? 'neon'), position, {
-    dimension,
-    numberPlate: plate ?? 'ADMIN',
-  });
-  player.putIntoVehicle(vehicle, 0);
 });
 
 appRoutes.build();
